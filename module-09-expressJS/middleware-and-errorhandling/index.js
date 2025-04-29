@@ -3,6 +3,7 @@ import cors from 'cors';
 import userRouter from './router/userRouter.js';
 import { log } from './middleware/log.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import ErrorResponse from './utils/ErrorResponse.js';
 
 const app = express();
 
@@ -17,6 +18,12 @@ app.use(log);
 
 // user endpoint
 app.use('/users', userRouter);
+
+// This runs when it does not find a matching endpoint above
+// Now we send a json body instead of the default express html template
+app.use((req, res) => {
+  throw new ErrorResponse('Page not found', 404);
+});
 
 //Error handler
 app.use(errorHandler);
