@@ -1,14 +1,21 @@
 import { mkdirSync, existsSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 import multer from 'multer';
+
+const __filename = fileURLToPath(import.meta.url); //Users/anojkt/file-upload/backend/middleware/fileUploader.js
+const __dirname = dirname(__filename); //Users/anojkt/file-upload/backend/middleware/
+
+const fileDirectory = join(__dirname, '../uploads'); //Users/anojkt/file-upload/backend/uploads
 
 const storage = multer.diskStorage({
   // To control where the file needs to be stored
   destination: function (req, file, cb) {
     //The below if statement checks if the folder exists and creates one if it doesn't exist
-    if (!existsSync('uploads')) {
-      mkdirSync('uploads', { recursive: true });
+    if (!existsSync(fileDirectory)) {
+      mkdirSync(fileDirectory, { recursive: true });
     }
-    cb(null, 'uploads/');
+    cb(null, fileDirectory);
   },
   // To control the naming of the file
   filename: function (req, file, cb) {

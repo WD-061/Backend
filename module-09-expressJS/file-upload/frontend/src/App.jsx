@@ -2,23 +2,23 @@ import { useState } from 'react';
 import Preview from './components/Preview';
 
 const App = () => {
-  const [image, setImage] = useState(null);
+  const [imageUrl, setImageUrl] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData();
+    formData.append('displayImage', event.target[0].files[0]);
+
     try {
-      const formData = new FormData();
-      formData.append('image', e.target[0].files[0]);
-      const res = await fetch('http://localhost:8080/upload', {
+      const res = await fetch('http://localhost:3000/upload', {
         method: 'POST',
         body: formData,
       });
-      if (!res.ok) {
-        const { error } = await res.json();
-        throw new Error(error);
-      }
+
       const data = await res.json();
-      setImage(data.location);
+      console.log(data);
+      setImageUrl(data.location);
     } catch (error) {
       console.log(error);
     }
@@ -29,8 +29,9 @@ const App = () => {
       <h1>File upload</h1>
       <form onSubmit={handleSubmit}>
         <input type='file' />
+        <button>Submit</button>
       </form>
-      {image && <Preview image={image} />}
+      {imageUrl && <Preview image={imageUrl} />}
     </div>
   );
 };
