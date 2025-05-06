@@ -27,13 +27,10 @@ export const getUserByID = async (req, res) => {
   try {
     const user = await User.findById(id);
 
-    if (!user) throw new ErrorResponse('Could not find user', 404);
+    if (!user) return res.status(404).json({ message: 'Could not find user' });
+
     res.status(200).json(user);
   } catch (error) {
-    if (error.message === 'Could not find user') {
-      throw new ErrorResponse(error.message, error.statusCode);
-    } else {
-      throw new ErrorResponse('Something went wrong', 400);
-    }
+    throw new ErrorResponse('Something went wrong', 400);
   }
 };
