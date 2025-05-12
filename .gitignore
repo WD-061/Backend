@@ -7,3 +7,6 @@ node_modules/
 # Ignore .vscode folder if present
 # A .vscode is usually created when you change vscode settings only for a certain workspace (project)
 .vscode/
+
+# Ignore macOS system files
+.DS_Store
