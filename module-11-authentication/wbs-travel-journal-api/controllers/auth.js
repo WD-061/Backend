@@ -3,6 +3,12 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import ErrorResponse from '../utils/ErrorResponse.js';
 
+export const me = async (req, res) => {
+  const user = await User.findById(req.userId);
+
+  res.status(200).json(user);
+};
+
 export const signUp = async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
 
@@ -25,7 +31,7 @@ export const signUp = async (req, res) => {
 export const signIn = async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email }).select('+password');
+  let user = await User.findOne({ email }).select('+password');
   if (!user) throw new ErrorResponse('Invalid credentials', 400);
 
   //Check if user typed password matches with hashed password on DB
@@ -44,8 +50,11 @@ export const signIn = async (req, res) => {
     sameSite: isProduction ? 'None' : 'Lax',
   };
 
+  user = user.toObject();
+  delete user.password;
+
   res.cookie('token', token, cookieOptions);
-  res.status(201).json({ message: 'Successfully logged in' });
+  res.status(201).json({ message: 'Successfully logged in', user });
 };
 
 export const signOut = async (req, res) => {
