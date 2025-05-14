@@ -9,6 +9,7 @@ const verifyToken = (req, res, next) => {
   const payload = jwt.verify(token, process.env.JWT_SECRET);
 
   req.userId = payload.id;
+  req.userRole = payload.role;
 
   next();
 };

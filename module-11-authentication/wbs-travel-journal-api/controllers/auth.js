@@ -39,9 +39,13 @@ export const signIn = async (req, res) => {
   if (!isMatch) throw new ErrorResponse('Invalid credentials', 400);
 
   //Generate a JWT token to be sent to client
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: '7d',
-  });
+  const token = jwt.sign(
+    { id: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: '7d',
+    }
+  );
 
   const isProduction = process.env.NODE_ENV === 'production';
   const cookieOptions = {

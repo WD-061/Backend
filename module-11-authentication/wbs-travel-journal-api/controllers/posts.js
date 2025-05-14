@@ -2,12 +2,12 @@ import { isValidObjectId } from 'mongoose';
 import Post from '../models/Post.js';
 import ErrorResponse from '../utils/ErrorResponse.js';
 
-export const getAllPosts = async (req, res, next) => {
+export const getAllPosts = async (req, res) => {
   const posts = await Post.find().populate('author');
   res.json(posts);
 };
 
-export const createPost = async (req, res, next) => {
+export const createPost = async (req, res) => {
   const { body } = req;
 
   const newPost = await (
@@ -17,7 +17,7 @@ export const createPost = async (req, res, next) => {
   res.status(201).json(newPost);
 };
 
-export const getSinglePost = async (req, res, next) => {
+export const getSinglePost = async (req, res) => {
   const {
     params: { id },
   } = req;
@@ -32,7 +32,7 @@ export const getSinglePost = async (req, res, next) => {
   res.send(post);
 };
 
-export const updatePost = async (req, res, next) => {
+export const updatePost = async (req, res) => {
   const {
     body,
     params: { id },
@@ -55,7 +55,7 @@ export const updatePost = async (req, res, next) => {
   res.json(updatedPost);
 };
 
-export const deletePost = async (req, res, next) => {
+export const deletePost = async (req, res) => {
   const {
     params: { id },
   } = req;
@@ -64,11 +64,12 @@ export const deletePost = async (req, res, next) => {
 
   const post = await Post.findById(id);
 
-  if (post.author.toString() !== req.userId)
-    throw new ErrorResponse('You are not authorized to delete this post', 403);
+  if (post.author.toString() === req.userId || req.userRole === 'admin') {
+    const deletedPost = await Post.findByIdAndDelete(id).populate('author');
+    if (!deletedPost) throw new Error(`Post with id of ${id} doesn't exist`);
 
-  const deletedPost = await Post.findByIdAndDelete(id).populate('author');
-  if (!deletedPost) throw new Error(`Post with id of ${id} doesn't exist`);
+    res.json({ success: `Post with id of ${id} was deleted` });
+  }
 
-  res.json({ success: `Post with id of ${id} was deleted` });
+  throw new ErrorResponse('You are not authorized to delete this post', 403);
 };
